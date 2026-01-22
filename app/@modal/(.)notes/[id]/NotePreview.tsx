@@ -8,7 +8,7 @@ export default function NotePreviewClient({ note }: { note: Note }) {
   const router = useRouter();
 
   const handleClose = () => {
-    router.back(); // ← ключовий момент
+    router.back(); 
   };
 
   return (
