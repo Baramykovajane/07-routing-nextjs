@@ -3,18 +3,26 @@ import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import "@/styles/globals.css";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+  modal,
+}: Readonly<{
+  children: React.ReactNode;
+  modal?: React.ReactNode;
+}>) {
   return (
     <html lang="en">
       <body>
-  <TanstackProvider>
-    <Header />
-    {children}
-    <Footer />
-    <div id="modal-root" />
-  </TanstackProvider>
-</body>
+        <TanstackProvider>
+          <Header />
 
+          {children}
+
+          {modal}
+
+          <Footer />
+        </TanstackProvider>
+      </body>
     </html>
   );
 }

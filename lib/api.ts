@@ -19,6 +19,7 @@ export interface FetchNotesParams {
   page: number;
   perPage: number;
   search?: string;
+  tag?: string;
 }
 
 export interface FetchNotesResponse {
@@ -34,13 +35,18 @@ export interface CreateNotePayload {
 
 /* ===== API ===== */
 
-export const fetchNotes = async (
-  params: FetchNotesParams
-): Promise<FetchNotesResponse> => {
-  const res = await axios.get<FetchNotesResponse>("/notes", { params });
+
+export const getNotes = async ({
+  page,
+  perPage,
+  search,
+  tag,
+}: FetchNotesParams): Promise<FetchNotesResponse> => {
+  const res = await axios.get<FetchNotesResponse>('/notes', {
+    params: { page, perPage, search, tag },
+  });
   return res.data;
 };
-
 export const createNote = async (
   payload: CreateNotePayload
 ): Promise<Note> => {
