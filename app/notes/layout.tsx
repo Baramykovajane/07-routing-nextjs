@@ -1,16 +1,9 @@
 import type { ReactNode } from "react";
 
-export default function NotesLayout({
-  children,
-  modal,
-}: {
-  children: ReactNode;
-  modal: ReactNode;
-}) {
+export default function NotesLayout({ children }: { children: ReactNode }) {
   return (
-    <>
+    <div>
       {children}
-      {modal}
-    </>
+    </div>
   );
 }
