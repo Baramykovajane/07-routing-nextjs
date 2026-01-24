@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useQuery,keepPreviousData } from '@tanstack/react-query';
 import { useDebounce } from 'use-debounce';
 import Link from "next/link";
 import { getNotes } from '@/lib/api';
@@ -9,6 +9,8 @@ import type { FetchNotesResponse } from '@/lib/api';
 import NoteList from '@/components/NoteList/NoteList';
 import Pagination from '@/components/Pagination/Pagination';
 import SearchBox from '@/components/SearchBox/SearchBox';
+import Modal from '@/components/Modal/Modal';
+import NoteForm from '@/components/NoteForm/NoteForm';
 
 import css from '@/styles/NotesPage.module.css';
 
@@ -24,14 +26,15 @@ export default function NotesClient({ tag, initialPage, initialSearch }: Props) 
   const [page, setPage] = useState(initialPage);
   const [search, setSearch] = useState(initialSearch);
   const [debouncedSearch] = useDebounce(search, 500);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
     setPage(1);
   };
 
-  const { data, isLoading, isError, isFetching } = useQuery<FetchNotesResponse>({
-    queryKey: ['notes', page, debouncedSearch, tag], 
+   const { data, isLoading, isError, isFetching } = useQuery<FetchNotesResponse>({
+    queryKey: ['notes', tag, page, debouncedSearch],
     queryFn: () =>
       getNotes({
         page,
@@ -39,7 +42,8 @@ export default function NotesClient({ tag, initialPage, initialSearch }: Props) 
         search: debouncedSearch || undefined,
         tag,
       }),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData,   
+
   });
 
   return (
@@ -61,9 +65,9 @@ export default function NotesClient({ tag, initialPage, initialSearch }: Props) 
           />
         )}
 
-       <Link href="/notes/new" className={css.button}>
-  Create note +
-</Link>
+        <button className={css.button} onClick={() => setIsModalOpen(true)}>
+          Create note +
+        </button>
       </header>
 
       {(isLoading || isFetching) && <p>Loading...</p>}
@@ -74,8 +78,18 @@ export default function NotesClient({ tag, initialPage, initialSearch }: Props) 
       ) : (
         !isLoading && <p>No notes found</p>
       )}
+
+      {isModalOpen && (
+        <Modal onClose={() => setIsModalOpen(false)}>
+          <NoteForm
+            onClose={() => setIsModalOpen(false)}
+            onCreated={() => {
+              setIsModalOpen(false);
+              
+            }}
+          />
+        </Modal>
+      )}
     </div>
   );
 }
-
-
