@@ -69,8 +69,8 @@ export default function NotesClient({ tag, initialPage, initialSearch }: Props) 
           Create note +
         </button>
       </header>
-
-      {(isLoading || isFetching) && <p>Loading...</p>}
+      
+ {(isLoading || isFetching) && <p>Loading...</p>}
       {isError && <p>Error loading notes</p>}
 
       {data?.notes.length ? (
@@ -79,17 +79,18 @@ export default function NotesClient({ tag, initialPage, initialSearch }: Props) 
         !isLoading && <p>No notes found</p>
       )}
 
-      {isModalOpen && (
-        <Modal onClose={() => setIsModalOpen(false)}>
-          <NoteForm
-            onClose={() => setIsModalOpen(false)}
-            onCreated={() => {
-              setIsModalOpen(false);
-              
-            }}
-          />
-        </Modal>
-      )}
+
+     {isModalOpen && (
+  <Modal onClose={() => setIsModalOpen(false)}>
+    <NoteForm
+      onClose={() => setIsModalOpen(false)}
+      onCreated={() => {
+        setPage(1);
+        setIsModalOpen(false);
+      }}
+    />
+  </Modal>
+)}
     </div>
   );
 }
