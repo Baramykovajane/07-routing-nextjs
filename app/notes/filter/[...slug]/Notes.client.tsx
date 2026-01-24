@@ -6,24 +6,23 @@ import { useDebounce } from 'use-debounce';
 import Link from "next/link";
 import { getNotes } from '@/lib/api';
 import type { FetchNotesResponse } from '@/lib/api';
-
 import NoteList from '@/components/NoteList/NoteList';
 import Pagination from '@/components/Pagination/Pagination';
 import SearchBox from '@/components/SearchBox/SearchBox';
-import Modal from '@/components/Modal/Modal';
-import NoteForm from '@/components/NoteForm/NoteForm';
 
 import css from '@/styles/NotesPage.module.css';
 
 const PER_PAGE = 12;
 
-type Props = { tag?: string };
+type Props = {
+  tag?: string;
+  initialPage: number;
+  initialSearch: string;
+};
 
-export default function NotesClient({ tag }: Props) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
-
+export default function NotesClient({ tag, initialPage, initialSearch }: Props) {
+  const [page, setPage] = useState(initialPage);
+  const [search, setSearch] = useState(initialSearch);
   const [debouncedSearch] = useDebounce(search, 500);
 
   const handleSearchChange = (value: string) => {
@@ -31,8 +30,8 @@ export default function NotesClient({ tag }: Props) {
     setPage(1);
   };
 
- const { data, isLoading, isError, isFetching } = useQuery<FetchNotesResponse>({
-    queryKey: ['notes', tag, page, debouncedSearch],
+  const { data, isLoading, isError, isFetching } = useQuery<FetchNotesResponse>({
+    queryKey: ['notes', page, debouncedSearch, tag], 
     queryFn: () =>
       getNotes({
         page,
@@ -40,7 +39,7 @@ export default function NotesClient({ tag }: Props) {
         search: debouncedSearch || undefined,
         tag,
       }),
-    placeholderData: keepPreviousData,   
+    placeholderData: keepPreviousData,
   });
 
   return (
@@ -48,14 +47,12 @@ export default function NotesClient({ tag }: Props) {
       <header className={css.toolbar}>
         <SearchBox value={search} onChange={handleSearchChange} />
 
-        
-        {tag !== undefined && (
+        {tag && (
           <Link href="/notes/filter/all" className={css.link}>
             All notes
           </Link>
         )}
 
-      
         {data?.totalPages && data.totalPages > 1 && (
           <Pagination
             pageCount={data.totalPages}
@@ -64,13 +61,9 @@ export default function NotesClient({ tag }: Props) {
           />
         )}
 
-        <button
-          type="button"
-          className={css.button}
-          onClick={() => setIsModalOpen(true)}
-        >
-          Create note +
-        </button>
+       <Link href="/notes/new" className={css.button}>
+  Create note +
+</Link>
       </header>
 
       {(isLoading || isFetching) && <p>Loading...</p>}
@@ -81,18 +74,8 @@ export default function NotesClient({ tag }: Props) {
       ) : (
         !isLoading && <p>No notes found</p>
       )}
-
-      {isModalOpen && (
-  <Modal onClose={() => setIsModalOpen(false)}>
-    <NoteForm
-      onClose={() => setIsModalOpen(false)}
-      onCreated={() => {
-        setPage(1);
-        setIsModalOpen(false);
-      }}
-    />
-  </Modal>
-)}
     </div>
   );
 }
+
+

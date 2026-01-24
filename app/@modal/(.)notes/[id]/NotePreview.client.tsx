@@ -1,26 +1,48 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import css from "@/styles/Modal.module.css";
+import { useQuery } from "@tanstack/react-query";
+import { useParams, useRouter } from "next/navigation";
+import Modal from "@/components/Modal/Modal";
+import { fetchNoteById } from "@/lib/api";
 
-type Props = {
-  children: React.ReactNode;
-};
-
-const Modal = ({ children }: Props) => {
+export default function NotePreviewClient() {
+  const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
-  const close = () => router.back();
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["note", id],
+    queryFn: () => fetchNoteById(id),
+    enabled: !!id,
+  });
+
+  const handleClose = () => {
+    router.back();
+  };
+
+  if (isLoading) {
+    return (
+      <Modal onClose={handleClose}>
+        Loading...
+      </Modal>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <Modal onClose={handleClose}>
+        Error loading note
+      </Modal>
+    );
+  }
 
   return (
-    <div className={css.backdrop}>
-      <div className={css.modal}>
-        <button className={css.closeBtn} onClick={close}>&times;</button>
-        {children}
-      </div>
-    </div>
+    <Modal onClose={handleClose}>
+      <h2>{data.title}</h2>
+      <p><b>Tag:</b> {data.tag}</p>
+      <p>{data.content}</p>
+      <small>
+        {new Date(data.createdAt).toLocaleString()}
+      </small>
+    </Modal>
   );
-};
-
-export default Modal;
-
+}

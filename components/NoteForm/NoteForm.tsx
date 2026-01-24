@@ -45,11 +45,9 @@ export default function NoteForm({ onClose, onCreated }: NoteFormProps) {
   const mutation = useMutation({
     mutationFn: createNote,
     onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ["notes"] });
-
-      onCreated();
-      onClose();
-    },
+  queryClient.invalidateQueries({ queryKey: ["notes"] });
+  onCreated();
+},
   });
 
   return (
