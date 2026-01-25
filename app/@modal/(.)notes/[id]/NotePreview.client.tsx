@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import Modal from "@/components/Modal/Modal";
 import { fetchNoteById } from "@/lib/api";
+import css from "@/styles/NotePreview.module.css"
 
 export default function NotePreviewClient() {
   const { id } = useParams<{ id: string }>();
@@ -37,13 +38,27 @@ export default function NotePreviewClient() {
   }
 
   return (
-    <Modal onClose={handleClose}>
+  <Modal onClose={handleClose}>
+    <div className={css.container}>
+  <div className={css.item}>
+    <div className={css.header}>
       <h2>{data.title}</h2>
-      <p><b>Tag:</b> {data.tag}</p>
-      <p>{data.content}</p>
-      <small>
-        {new Date(data.createdAt).toLocaleString()}
-      </small>
-    </Modal>
-  );
+      <span className={css.tag}>{data.tag}</span>
+    </div>
+
+    <p className={css.content}>{data.content}</p>
+
+    <small className={css.date}>
+      {new Date(data.createdAt).toLocaleString()}
+    </small>
+
+    <button className={css.backBtn} onClick={handleClose}>
+      ← Back
+    </button>
+  </div>
+</div>
+
+  </Modal>
+);
+
 }
